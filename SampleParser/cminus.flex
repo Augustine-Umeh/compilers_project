@@ -83,7 +83,7 @@ NUM = [0-9]+
 ID = [_a-zA-Z][_a-zA-Z0-9]*
 
 /*  */
-TRUTH = true || false
+TRUTH = true|false
    
 %%
 /* ------------------------Lexical Rules Section---------------------- */
@@ -93,38 +93,38 @@ TRUTH = true || false
    code, that will be executed when the scanner matches the associated
    regular expression. */
    
-"bool"          { return symbol(sym.BOOL); }
-"else"          { return symbol(sym.ELSE); }
-"if"            { return symbol(sym.IF); }
-"int"           { return symbol(sym.INT); }
-"return"        { return symbol(sym.RETURN); }
-"void"          { return symbol(sym.VOID); }
-"while"         { return symbol(sym.WHILE); }
-"*"             { return symbol(sym.TIMES); }
-"/"             { return symbol(sym.OVER); }
-"<"             { return symbol(sym.LT); }
-">"             { return symbol(sym.GT); }
-"+"             { return symbol(sym.PLUS); }
-"-"             { return symbol(sym.MINUS); }
-">="            { return symbol(sym.LTEQ); }
-"<="            { return symbol(sym.GTEQ); }
-"=="            { return symbol(sym.EQ); }
-"!="            { return symbol(sym.NEQ); }
-"~"             { return symbol(sym.UMINUS); }
-"||"            { return symbol(sym.OR); }
-"&&"            { return symbol(sym.AND); }
-"="             { return symbol(sym.ASSIGN); }
-";"             { return symbol(sym.SEMI); }
-","             { return symbol(sym.COMMA); }
-"{"             { return symbol(sym.LCB); }
-"}"             { return symbol(sym.RCB); }
-"["             { return symbol(sym.LSB); }
-"]"             { return symbol(sym.RSB); }
-"("             { return symbol(sym.LHB); }
-")"             { return symbol(sym.RHB); }
-{NUM}           { return symbol(sym.NUM, yytext()); }
-{ID}            { return symbol(sym.ID, yytext()); }
-{TRUTH}         { return symbol(sym.TRUTH, yytext()); }
-{WhiteSpace}+   { /* skip whitespace */ }   
-/\*.*?\*/       { /* skip comments */ }
-.               { return symbol(sym.ERROR); }
+"bool"                           { System.out.print("bool");return symbol(sym.BOOL); }
+"else"                           { System.out.print("else");return symbol(sym.ELSE); }
+"if"                             { System.out.print("if");return symbol(sym.IF); }
+"int"                            { System.out.print("int");return symbol(sym.INT); }
+"return"                         { System.out.print("return");return symbol(sym.RETURN); }
+"void"                           { System.out.print("void");return symbol(sym.VOID); }
+"while"                          { System.out.print("while");return symbol(sym.WHILE); }
+"*"                              { System.out.print("times");return symbol(sym.TIMES); }
+"/"                              { System.out.print("over");return symbol(sym.OVER); }
+"<"                              { System.out.print("lt");return symbol(sym.LT); }
+">"                              { System.out.print("gt");return symbol(sym.GT); }
+"+"                              { System.out.print("plus");return symbol(sym.PLUS); }
+"-"                              { System.out.print("minus");return symbol(sym.MINUS); }
+">="                             { System.out.print(">=");return symbol(sym.GTEQ); }
+"<="                             { System.out.print("<=>");return symbol(sym.LTEQ); }
+"=="                             { System.out.print("==");return symbol(sym.EQ); }
+"!="                             { System.out.print("!=");return symbol(sym.NEQ); }
+"~"                              { System.out.print("~");return symbol(sym.UMINUS); }
+"||"                             { System.out.print("||");return symbol(sym.OR); }
+"&&"                             { System.out.print("&&");return symbol(sym.AND); }
+"="                              { System.out.print("=");return symbol(sym.ASSIGN); }
+";"                              { System.out.print(";");return symbol(sym.SEMI); }
+","                              { System.out.print(",");return symbol(sym.COMMA); }
+"{"                              { System.out.print("LCB");return symbol(sym.LCB); }
+"}"                              { System.out.print("RCB");return symbol(sym.RCB); }
+"["                              { System.out.print("LSB");return symbol(sym.LSB); }
+"]"                              { System.out.print("RSB");return symbol(sym.RSB); }
+"("                              { System.out.print("LHB");return symbol(sym.LHB); }
+")"                              { System.out.print("RHB");return symbol(sym.RHB); }
+{NUM}                            { System.out.print("NUM");return symbol(sym.NUM, yytext()); }
+{ID}                             { System.out.print("ID");return symbol(sym.ID, yytext()); }
+{TRUTH}                          { System.out.print("TRUTH");return symbol(sym.TRUTH, yytext()); }
+{WhiteSpace}+                    { /* skip whitespace */ }   
+"/*"([^*]|\*+[^*/])*\*+"/"       { /* skip comments */ }
+.                                { return symbol(sym.ERROR); }
