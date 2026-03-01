@@ -93,38 +93,37 @@ TRUTH = true|false
    code, that will be executed when the scanner matches the associated
    regular expression. */
    
-"bool"                           { System.out.print("bool");return symbol(sym.BOOL); }
-"else"                           { System.out.print("else");return symbol(sym.ELSE); }
-"if"                             { System.out.print("if");return symbol(sym.IF); }
-"int"                            { System.out.print("int");return symbol(sym.INT); }
-"return"                         { System.out.print("return");return symbol(sym.RETURN); }
-"void"                           { System.out.print("void");return symbol(sym.VOID); }
-"while"                          { System.out.print("while");return symbol(sym.WHILE); }
-"*"                              { System.out.print("times");return symbol(sym.TIMES); }
-"/"                              { System.out.print("over");return symbol(sym.OVER); }
-"<"                              { System.out.print("lt");return symbol(sym.LT); }
-">"                              { System.out.print("gt");return symbol(sym.GT); }
-"+"                              { System.out.print("plus");return symbol(sym.PLUS); }
-"-"                              { System.out.print("minus");return symbol(sym.MINUS); }
-">="                             { System.out.print(">=");return symbol(sym.GTEQ); }
-"<="                             { System.out.print("<=>");return symbol(sym.LTEQ); }
-"=="                             { System.out.print("==");return symbol(sym.EQ); }
-"!="                             { System.out.print("!=");return symbol(sym.NEQ); }
-"~"                              { System.out.print("~");return symbol(sym.UMINUS); }
-"||"                             { System.out.print("||");return symbol(sym.OR); }
-"&&"                             { System.out.print("&&");return symbol(sym.AND); }
-"="                              { System.out.print("=");return symbol(sym.ASSIGN); }
-";"                              { System.out.print(";");return symbol(sym.SEMI); }
-","                              { System.out.print(",");return symbol(sym.COMMA); }
-"{"                              { System.out.print("LCB");return symbol(sym.LCB); }
-"}"                              { System.out.print("RCB");return symbol(sym.RCB); }
-"["                              { System.out.print("LSB");return symbol(sym.LSB); }
-"]"                              { System.out.print("RSB");return symbol(sym.RSB); }
-"("                              { System.out.print("LHB");return symbol(sym.LHB); }
-")"                              { System.out.print("RHB");return symbol(sym.RHB); }
-{NUM}                            { System.out.print("NUM");return symbol(sym.NUM, yytext()); }
-{ID}                             { System.out.print("ID");return symbol(sym.ID, yytext()); }
-{TRUTH}                          { System.out.print("TRUTH");return symbol(sym.TRUTH, yytext()); }
+"bool"                           { System.out.print("bool"); return symbol(sym.BOOL); }
+"else"                           { System.out.print("else"); return symbol(sym.ELSE); }
+"if"                             { System.out.print("if"); return symbol(sym.IF); }
+"int"                            { System.out.print("int"); return symbol(sym.INT); }
+"return"                         { System.out.print("return"); return symbol(sym.RETURN); }
+"void"                           { System.out.print("void"); return symbol(sym.VOID); }
+"while"                          { System.out.print("while"); return symbol(sym.WHILE); }
+"*"                              { System.out.print("times"); return symbol(sym.TIMES); }
+"/"                              { System.out.print("over"); return symbol(sym.OVER); }
+"<"                              { System.out.print("lt"); return symbol(sym.LT); }
+">"                              { System.out.print("gt"); return symbol(sym.GT); }
+"+"                              { System.out.print("plus"); return symbol(sym.PLUS); }
+"-"                              { System.out.print("minus"); return symbol(sym.MINUS); }
+">="                             { System.out.print(">="); return symbol(sym.GTEQ); }
+"<="                             { System.out.print("<="); return symbol(sym.LTEQ); }
+"=="                             { System.out.print("=="); return symbol(sym.EQ); }
+"!="                             { System.out.print("!="); return symbol(sym.NEQ); }
+"||"                             { System.out.print("||"); return symbol(sym.OR); }
+"&&"                             { System.out.print("&&"); return symbol(sym.AND); }
+"="                              { System.out.print("="); return symbol(sym.ASSIGN); }
+";"                              { System.out.print(";"); return symbol(sym.SEMI); }
+","                              { System.out.print(","); return symbol(sym.COMMA); }
+"{"                              { System.out.print("{"); return symbol(sym.LBRACE); }
+"}"                              { System.out.print("}"); return symbol(sym.RBRACE); }
+"["                              { System.out.print("["); return symbol(sym.LBRACK); }
+"]"                              { System.out.print("]"); return symbol(sym.RBRACK); }
+"("                              { System.out.print("("); return symbol(sym.LPAREN); }
+")"                              { System.out.print(")"); return symbol(sym.RPAREN); }
+{NUM}                            { System.out.print("NUM"); return symbol(sym.NUM, yytext()); }
+{TRUTH}                          { System.out.print("TRUTH"); return symbol(sym.TRUTH, yytext()); }
+{ID}                             { System.out.print("ID"); return symbol(sym.ID, yytext()); }
 {WhiteSpace}+                    { /* skip whitespace */ }   
 "/*"([^*]|\*+[^*/])*\*+"/"       { /* skip comments */ }
 .                                { return symbol(sym.ERROR); }
