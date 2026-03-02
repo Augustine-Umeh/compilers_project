@@ -1,5 +1,5 @@
 /*
-  Created by: Fei Song, Silas Wright
+  Created by: Fei Song, Silas Wright, Ashmit Mittal
   File Name: cminus.cup
 */
    
@@ -176,10 +176,17 @@ type_specifier
                   {: RESULT = new TypeSpec(bleft, bright, "bool"); :}
                 ;
 
+var_type
+              ::=INT:i
+                  {:RESULT = new TypeSpec(ileft, iright, "int"); :}
+                | BOOL:b
+                  {: RESULT = new TypeSpec(bleft, bright, "bool"); :}
+                ;
+
 var_declaration
-              ::= type_specifier:t ID:i SEMI
+              ::= var_type:t ID:i SEMI
                   {: RESULT = new VarDeclExp(ileft, iright, (TypeSpec)t, i, null); :}
-                | type_specifier:t ID:i LBRACK NUM:n RBRACK SEMI
+                | var_type:t ID:i LBRACK NUM:n RBRACK SEMI
                   {: RESULT = new VarDeclExp(ileft, iright, (TypeSpec)t, i, new IntExp(nleft, nright, n)); :}
                 ;
 
@@ -204,9 +211,9 @@ param_list    ::= param_list:l COMMA param:p
                   {: RESULT = singleton(p); :}
                 ;
 
-param         ::= type_specifier:t ID:i
+param         ::= var_type:t ID:i
                   {: RESULT = new ParamExp(ileft, iright, (TypeSpec)t, i, false); :}
-                | type_specifier:t ID:i LBRACK RBRACK
+                | var_type:t ID:i LBRACK RBRACK
                   {: RESULT = new ParamExp(ileft, iright, (TypeSpec)t, i, true); :}
                 ;
 

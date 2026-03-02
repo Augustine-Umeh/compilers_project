@@ -175,6 +175,7 @@ type_specifier
                   {: RESULT = new VarExp(bleft, bright, "bool"); :}
                 ;
 
+
 var_declaration
               ::= type_specifier:t ID:i SEMI
                   {: RESULT = new AssignExp(ileft, iright, new VarExp(ileft, iright, i), t); :}
