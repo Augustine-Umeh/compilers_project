@@ -1,14 +1,49 @@
-{ Sample program in Tiny language - compute factorial }
-
-read x; { input an integer }
-if x > 0 then { don't compute if x <= 0 }
-  fact := -2 + 3;   { same as fact := 1; }
-
-  repeat 
-    fact := fact * $$;
-    x := x - 1
-  until x = 0;
-
-  write fact & x { output factorial of x } 
-{end}
-
+/* A program to perform selection sort on an array of
+10 integers */
+int x[10];
+int minloc(int a[], int low, int high) {
+int i;
+int x;
+int k;
+bool test;
+test = true;
+k = low;
+x = a[low];
+i = low + 1;
+while (~test) {
+if (a[i] < x) {
+x = a[i];
+k = i;
+}
+i = i + 1;
+test = false;
+}
+return k;
+}
+void sort(int a[], int low, int high) {
+int i;
+int k;
+i = low;
+while (i < high - 1) {
+int t;
+k = minloc(a, i, high);
+t = a[k];
+a[k] = a[i];
+a[i] = t;
+i = i + 1;
+}
+}
+void main(void) {
+int i;
+i = 0;
+while (i < 10) {
+x[i] = input();
+i = i + 1;
+}
+sort(x, 0, 10);
+i = 0;
+while (i < 10) {
+output(x[i]);
+i = i + 1;
+}
+}

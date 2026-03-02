@@ -112,6 +112,7 @@ TRUTH = true|false
 "!="                             {return symbol(sym.NEQ);}
 "||"                             {return symbol(sym.OR);}
 "&&"                             {return symbol(sym.AND);}
+"~"                              {return symbol(sym.NOT);}
 "="                              {return symbol(sym.ASSIGN);}
 ";"                              {return symbol(sym.SEMI);}
 ","                              {return symbol(sym.COMMA);}

@@ -1,6 +1,6 @@
 /*
-  Created by: Fei Song
-  File Name: tiny.cup
+  Created by: Fei Song, Silas Wright
+  File Name: cminus.cup
 */
    
    
@@ -119,7 +119,7 @@ parser code {:
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
    
 terminal IF, ELSE, BOOL, INT, RETURN, VOID, WHILE;
-terminal ASSIGN, EQ, NEQ, LT, LTEQ, GT, GTEQ, PLUS, MINUS, TIMES, OVER, AND, OR, UMINUS;
+terminal ASSIGN, EQ, NEQ, LT, LTEQ, GT, GTEQ, PLUS, MINUS, TIMES, OVER, AND, OR, NOT, UMINUS;
 terminal LPAREN, RPAREN, LBRACE, RBRACE, LBRACK, RBRACK, SEMI, COMMA;
 terminal String ID, NUM, TRUTH;
 terminal ERROR;
@@ -127,8 +127,8 @@ terminal ERROR;
 non terminal ExpList program, declaration_list, local_declarations, statement_list, params, param_list, args, arg_list;
 non terminal Exp declaration, var_declaration, fun_declaration, fun_prototype, type_specifier, param;
 non terminal Exp statement, expression_stmt, selection_stmt, iteration_stmt, return_stmt, compound_stmt;
-non terminal Exp expression, var, obool_expression, abool_expression, ubool_expression, simple_expression;
-non terminal Exp additive_expression, term, signed_factor, factor, call;
+non terminal Exp expression, var;
+non terminal Exp factor, call;
 non terminal Integer relop;
 
 precedence right ASSIGN;
@@ -137,6 +137,7 @@ precedence left AND;
 precedence nonassoc EQ, NEQ, LT, LTEQ, GT, GTEQ;
 precedence left PLUS, MINUS;
 precedence left TIMES, OVER; 
+precedence right NOT;
 precedence right UMINUS; 
 
 /* ----------------------------Grammar Section-------------------- */
@@ -168,44 +169,33 @@ declaration   ::= var_declaration:d
 
 type_specifier
               ::= INT:i
-                  {: RESULT = new VarExp(ileft, iright, "int"); :}
+                  {: RESULT = new TypeSpec(ileft, iright, "int"); :}
                 | VOID:v
-                  {: RESULT = new VarExp(vleft, vright, "void"); :}
+                  {: RESULT = new TypeSpec(vleft, vright, "void"); :}
                 | BOOL:b
-                  {: RESULT = new VarExp(bleft, bright, "bool"); :}
+                  {: RESULT = new TypeSpec(bleft, bright, "bool"); :}
                 ;
 
 var_declaration
               ::= type_specifier:t ID:i SEMI
-                  {: RESULT = new AssignExp(ileft, iright, new VarExp(ileft, iright, i), t); :}
+                  {: RESULT = new VarDeclExp(ileft, iright, (TypeSpec)t, i, null); :}
                 | type_specifier:t ID:i LBRACK NUM:n RBRACK SEMI
-                  {: RESULT = new AssignExp(ileft, iright,
-                                            new VarExp(ileft, iright, i),
-                                            new OpExp(ileft, iright, t, OpExp.LSB, new IntExp(nleft, nright, n)));
-                  :}
+                  {: RESULT = new VarDeclExp(ileft, iright, (TypeSpec)t, i, new IntExp(nleft, nright, n)); :}
                 ;
 
 fun_declaration
               ::= type_specifier:t ID:i LPAREN params:p RPAREN compound_stmt:c
-                  {: Exp sig = new AssignExp(ileft, iright, new VarExp(ileft, iright, i), t);
-                     Exp packedParams = packListAsCommaExpr(p, ileft, iright);
-                     Exp header = new OpExp(ileft, iright, sig, OpExp.LHB, packedParams);
-                     RESULT = new OpExp(ileft, iright, header, OpExp.RHB, c);
-                  :}
+                  {: RESULT = new FunDeclExp(ileft, iright, (TypeSpec)t, i, p, (CompoundExp)c); :}
                 ;
 
 fun_prototype ::= type_specifier:t ID:i LPAREN params:p RPAREN SEMI
-                  {: Exp sig = new AssignExp(ileft, iright, new VarExp(ileft, iright, i), t);
-                     Exp packedParams = packListAsCommaExpr(p, ileft, iright);
-                     Exp header = new OpExp(ileft, iright, sig, OpExp.LHB, packedParams);
-                     RESULT = new OpExp(ileft, iright, header, OpExp.SEMI, new NilExp(ileft, iright));
-                  :}
+                  {: RESULT = new FunDeclExp(ileft, iright, (TypeSpec)t, i, p, null); :}
                 ;
 
 params        ::= param_list:p
                   {: RESULT = p; :}
                 | VOID:v
-                  {: RESULT = singleton(new VarExp(vleft, vright, "void")); :}
+                  {: RESULT = singleton(new NilExp(vleft, vright)); :}
                 ;
 
 param_list    ::= param_list:l COMMA param:p
@@ -215,16 +205,13 @@ param_list    ::= param_list:l COMMA param:p
                 ;
 
 param         ::= type_specifier:t ID:i
-                  {: RESULT = new AssignExp(ileft, iright, new VarExp(ileft, iright, i), t); :}
+                  {: RESULT = new ParamExp(ileft, iright, (TypeSpec)t, i, false); :}
                 | type_specifier:t ID:i LBRACK RBRACK
-                  {: RESULT = new AssignExp(ileft, iright,
-                                            new VarExp(ileft, iright, i),
-                                            new OpExp(ileft, iright, t, OpExp.LSB, null));
-                  :}
+                  {: RESULT = new ParamExp(ileft, iright, (TypeSpec)t, i, true); :}
                 ;
 
 compound_stmt ::= LBRACE local_declarations:l statement_list:s RBRACE
-                  {: RESULT = new RepeatExp(lleft, lright, concat(l, s), null); :}
+                  {: RESULT = new CompoundExp(lleft, lright, l, s); :}
                 ;
 
 local_declarations
@@ -257,7 +244,7 @@ expression_stmt
               ::= expression:e SEMI
                   {: RESULT = e; :}
                 | SEMI:s
-                  {: RESULT = new WriteExp(sleft, sright, null); :}
+                  {: RESULT = new NilExp(sleft, sright); :}
                 ;
 
 selection_stmt
@@ -269,47 +256,39 @@ selection_stmt
 
 iteration_stmt
               ::= WHILE:w LPAREN expression:e RPAREN statement:s
-                  {: RESULT = new RepeatExp(wleft, wright, singleton(s), e); :}
+                  {: RESULT = new WhileExp(wleft, wright, e, s); :}
                 ;
 
 return_stmt   ::= RETURN:r SEMI
-                  {: RESULT = new WriteExp(rleft, rright, new NilExp(rleft, rright)); :}
+                  {: RESULT = new ReturnExp(rleft, rright, new NilExp(rleft, rright)); :}
                 | RETURN:r expression:e SEMI
-                  {: RESULT = new WriteExp(rleft, rright, e); :}
+                  {: RESULT = new ReturnExp(rleft, rright, e); :}
                 ;
 
 expression    ::= var:v ASSIGN expression:e
                   {: RESULT = new OpExp(vleft, vright, v, OpExp.ASSIGN, e); :}
-                | obool_expression:e
-                  {: RESULT = e; :}
-                ;
-
-obool_expression
-              ::= obool_expression:l OR abool_expression:r
+                | expression:l OR expression:r
                   {: RESULT = new OpExp(lleft, lright, l, OpExp.OR, r); :}
-                | abool_expression:e
-                  {: RESULT = e; :}
-                ;
-
-abool_expression
-              ::= abool_expression:l AND ubool_expression:r
+                | expression:l AND expression:r
                   {: RESULT = new OpExp(lleft, lright, l, OpExp.AND, r); :}
-                | ubool_expression:e
-                  {: RESULT = e; :}
-                ;
-
-ubool_expression
-              ::= UMINUS:n ubool_expression:e
-                  {: RESULT = new OpExp(nleft, nright, new NilExp(nleft, nright), OpExp.BOOL, e); :}
-                | simple_expression:e
-                  {: RESULT = e; :}
-                ;
-
-simple_expression
-              ::= additive_expression:l relop:o additive_expression:r
+                | expression:l relop:o expression:r
                   {: RESULT = new OpExp(lleft, lright, l, o.intValue(), r); :}
-                | additive_expression:e
-                  {: RESULT = e; :}
+                | expression:l PLUS expression:r
+                  {: RESULT = new OpExp(lleft, lright, l, OpExp.PLUS, r); :}
+                | expression:l MINUS expression:r
+                  {: RESULT = new OpExp(lleft, lright, l, OpExp.MINUS, r); :}
+                | expression:l TIMES expression:r
+                  {: RESULT = new OpExp(lleft, lright, l, OpExp.TIMES, r); :}
+                | expression:l OVER expression:r
+                  {: RESULT = new OpExp(lleft, lright, l, OpExp.OVER, r); :}
+                | MINUS:m expression:e
+                  {: RESULT = new OpExp(mleft, mright, new NilExp(mleft, mright), OpExp.UMINUS, e); :}
+                  %prec UMINUS
+                | NOT:n expression:e
+                  {: RESULT = new OpExp(nleft, nright, new NilExp(nleft, nright), OpExp.NOT, e); :}
+                  %prec NOT
+                | factor:f
+                  {: RESULT = f; :}
                 ;
 
 relop         ::= LTEQ
@@ -326,30 +305,6 @@ relop         ::= LTEQ
                   {: RESULT = Integer.valueOf(OpExp.NEQ); :}
                 ;
 
-additive_expression
-              ::= additive_expression:l PLUS term:r
-                  {: RESULT = new OpExp(lleft, lright, l, OpExp.PLUS, r); :}
-                | additive_expression:l MINUS term:r
-                  {: RESULT = new OpExp(lleft, lright, l, OpExp.MINUS, r); :}
-                | term:e
-                  {: RESULT = e; :}
-                ;
-
-term          ::= term:l TIMES signed_factor:r
-                  {: RESULT = new OpExp(lleft, lright, l, OpExp.TIMES, r); :}
-                | term:l OVER signed_factor:r
-                  {: RESULT = new OpExp(lleft, lright, l, OpExp.OVER, r); :}
-                | signed_factor:e
-                  {: RESULT = e; :}
-                ;
-
-signed_factor ::= MINUS:m signed_factor:e
-                  {: RESULT = new OpExp(mleft, mright, new NilExp(mleft, mright), OpExp.UMINUS, e); :}
-                  %prec UMINUS
-                | factor:f
-                  {: RESULT = f; :}
-                ;
-
 factor        ::= LPAREN expression:e RPAREN
                   {: RESULT = e; :}
                 | LPAREN error RPAREN
@@ -363,13 +318,11 @@ factor        ::= LPAREN expression:e RPAREN
                 | NUM:n
                   {: RESULT = new IntExp(nleft, nright, n); :}
                 | TRUTH:t
-                  {: RESULT = new VarExp(tleft, tright, t); :}
+                  {: RESULT = new BoolExp(tleft, tright, t); :}
                 ;
 
 call          ::= ID:i LPAREN args:a RPAREN
-                  {: Exp packedArgs = packListAsCommaExpr(a, ileft, iright);
-                     RESULT = new OpExp(ileft, iright, new VarExp(ileft, iright, i), OpExp.LHB, packedArgs);
-                  :}
+                  {: RESULT = new CallExp(ileft, iright, i, a); :}
                 ;
 
 args          ::= arg_list:l
@@ -387,6 +340,5 @@ arg_list      ::= arg_list:l COMMA expression:e
 var           ::= ID:i
                   {: RESULT = new VarExp(ileft, iright, i); :}
                 | ID:i LBRACK expression:e RBRACK
-                  {: RESULT = new OpExp(ileft, iright, new VarExp(ileft, iright, i), OpExp.LSB, e); :}
+                  {: RESULT = new IndexVarExp(ileft, iright, i, e); :}
                 ;
-

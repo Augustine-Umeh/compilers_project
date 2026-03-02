@@ -33,6 +33,7 @@ public class OpExp extends Exp {
   public final static int NUM = 29;
   public final static int ID = 30;
   public final static int TRUTH = 31;
+  public final static int NOT = 32;
 
   public Exp left;
   public int op;
