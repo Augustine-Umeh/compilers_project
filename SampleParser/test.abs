@@ -1,0 +1,187 @@
+The abstract syntax tree is:
+VarDeclExp: x
+    TypeSpec: int
+    ArraySize:
+        IntExp: 10
+FunDeclExp: minloc
+    ResultType:
+        TypeSpec: int
+    Params:
+        ParamExp: a[]
+            TypeSpec: int
+        ParamExp: low
+            TypeSpec: int
+        ParamExp: high
+            TypeSpec: int
+    Body:
+        CompoundExp:
+            LocalDecls:
+                VarDeclExp: i
+                    TypeSpec: int
+                VarDeclExp: x
+                    TypeSpec: int
+                VarDeclExp: k
+                    TypeSpec: int
+                VarDeclExp: test
+                    TypeSpec: bool
+            Statements:
+                OpExp: =
+                    VarExp: test
+                    BoolExp: true
+                OpExp: =
+                    VarExp: k
+                    VarExp: low
+                OpExp: =
+                    VarExp: x
+                    IndexVarExp: a
+                        VarExp: low
+                OpExp: =
+                    VarExp: i
+                    OpExp: +
+                        VarExp: low
+                        IntExp: 1
+                WhileExp:
+                    Condition:
+                        OpExp: NOT
+                            NilExp
+                            VarExp: test
+                    Body:
+                        CompoundExp:
+                            Statements:
+                                IfExp:
+                                    OpExp: <
+                                        IndexVarExp: a
+                                            VarExp: i
+                                        VarExp: x
+                                    CompoundExp:
+                                        Statements:
+                                            OpExp: =
+                                                VarExp: x
+                                                IndexVarExp: a
+                                                    VarExp: i
+                                            OpExp: =
+                                                VarExp: k
+                                                VarExp: i
+                                    NilExp
+                                OpExp: =
+                                    VarExp: i
+                                    OpExp: +
+                                        VarExp: i
+                                        IntExp: 1
+                                OpExp: =
+                                    VarExp: test
+                                    BoolExp: false
+                ReturnExp:
+                    VarExp: k
+FunDeclExp: sort
+    ResultType:
+        TypeSpec: void
+    Params:
+        ParamExp: a[]
+            TypeSpec: int
+        ParamExp: low
+            TypeSpec: int
+        ParamExp: high
+            TypeSpec: int
+    Body:
+        CompoundExp:
+            LocalDecls:
+                VarDeclExp: i
+                    TypeSpec: int
+                VarDeclExp: k
+                    TypeSpec: int
+            Statements:
+                OpExp: =
+                    VarExp: i
+                    VarExp: low
+                WhileExp:
+                    Condition:
+                        OpExp: <
+                            VarExp: i
+                            OpExp: -
+                                VarExp: high
+                                IntExp: 1
+                    Body:
+                        CompoundExp:
+                            LocalDecls:
+                                VarDeclExp: t
+                                    TypeSpec: int
+                            Statements:
+                                OpExp: =
+                                    VarExp: k
+                                    CallExp: minloc
+                                        VarExp: a
+                                        VarExp: i
+                                        VarExp: high
+                                OpExp: =
+                                    VarExp: t
+                                    IndexVarExp: a
+                                        VarExp: k
+                                OpExp: =
+                                    IndexVarExp: a
+                                        VarExp: k
+                                    IndexVarExp: a
+                                        VarExp: i
+                                OpExp: =
+                                    IndexVarExp: a
+                                        VarExp: i
+                                    VarExp: t
+                                OpExp: =
+                                    VarExp: i
+                                    OpExp: +
+                                        VarExp: i
+                                        IntExp: 1
+FunDeclExp: main
+    ResultType:
+        TypeSpec: void
+    Params:
+        NilExp
+    Body:
+        CompoundExp:
+            LocalDecls:
+                VarDeclExp: i
+                    TypeSpec: int
+            Statements:
+                OpExp: =
+                    VarExp: i
+                    IntExp: 0
+                WhileExp:
+                    Condition:
+                        OpExp: <
+                            VarExp: i
+                            IntExp: 10
+                    Body:
+                        CompoundExp:
+                            Statements:
+                                OpExp: =
+                                    IndexVarExp: x
+                                        VarExp: i
+                                    CallExp: input
+                                OpExp: =
+                                    VarExp: i
+                                    OpExp: +
+                                        VarExp: i
+                                        IntExp: 1
+                CallExp: sort
+                    VarExp: x
+                    IntExp: 0
+                    IntExp: 10
+                OpExp: =
+                    VarExp: i
+                    IntExp: 0
+                WhileExp:
+                    Condition:
+                        OpExp: <
+                            VarExp: i
+                            IntExp: 10
+                    Body:
+                        CompoundExp:
+                            Statements:
+                                CallExp: output
+                                    IndexVarExp: x
+                                        VarExp: i
+                                OpExp: =
+                                    VarExp: i
+                                    OpExp: +
+                                        VarExp: i
+                                        IntExp: 1

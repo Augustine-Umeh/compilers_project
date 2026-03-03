@@ -17,39 +17,35 @@ parser code {:
        reason for the error which is passed into the method in the
        String 'message'. */
     public void report_error(String message, Object info) {
-   
-        /* Create a StringBuffer called 'm' with the string 'Error' in it. */
-        StringBuffer m = new StringBuffer("Error");
-   
+        /* Create a builder with the standard syntax-error prefix. */
+        StringBuilder m = new StringBuilder("Syntax error");
+
         /* Check if the information passed to the method is the same
-           type as the type java_cup.runtime.Symbol. */
+           type as java_cup.runtime.Symbol. */
         if (info instanceof java_cup.runtime.Symbol) {
             /* Declare a java_cup.runtime.Symbol object 's' with the
-               information in the object info that is being typecasted
-               as a java_cup.runtime.Symbol object. */
+               information in the object info that is being typecast as
+               a java_cup.runtime.Symbol object. */
             java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
-   
-            /* Check if the line number in the input is greater or
-               equal to zero. */
-            if (s.left >= 0) {                
-                /* Add to the end of the StringBuffer error message
-                   the line number of the error in the input. */
-                m.append(" in line "+(s.left+1));   
-                /* Check if the column number in the input is greater
-                   or equal to zero. */
-                if (s.right >= 0)                    
-                    /* Add to the end of the StringBuffer error message
-                       the column number of the error in the input. */
-                    m.append(", column "+(s.right+1));
+            String tok = tokenName(s.sym);
+            String val = (s.value == null) ? "<none>" : s.value.toString();
+
+            /* Include line/column when CUP provides valid positions. */
+            if (s.left >= 0) {
+                m.append(" at line ").append(s.left + 1);
+                if (s.right >= 0) {
+                    m.append(", column ").append(s.right + 1);
+                }
             }
+
+            /* Include token class and lexeme/value for easier debugging. */
+            m.append(" [token=").append(tok).append(", value=").append(val).append("]");
         }
-   
-        /* Add to the end of the StringBuffer error message created in
-           this method the message that was passed into this method. */
-        m.append(" : "+message);
-   
-        /* Print the contents of the StringBuffer 'm', which contains
-           an error message, out on a line. */
+
+        /* Append parser-specific reason passed into this method. */
+        m.append(": ").append(message);
+
+        /* Print the assembled error message. */
         System.err.println(m);
         valid = false;
     }
@@ -66,6 +62,33 @@ parser code {:
 
     /* Assume true at the start, but set to false with parsing errors */
     public static boolean valid = true;
+
+    private String tokenName(int tokenId) {
+        switch (tokenId) {
+            case sym.IF: return "IF";
+            case sym.ELSE: return "ELSE";
+            case sym.BOOL: return "BOOL";
+            case sym.INT: return "INT";
+            case sym.RETURN: return "RETURN";
+            case sym.VOID: return "VOID";
+            case sym.WHILE: return "WHILE";
+            case sym.ID: return "ID";
+            case sym.NUM: return "NUM";
+            case sym.TRUTH: return "TRUTH";
+            case sym.NOT: return "NOT";
+            case sym.MINUS: return "MINUS";
+            case sym.SEMI: return "SEMI";
+            case sym.COMMA: return "COMMA";
+            case sym.LPAREN: return "LPAREN";
+            case sym.RPAREN: return "RPAREN";
+            case sym.LBRACE: return "LBRACE";
+            case sym.RBRACE: return "RBRACE";
+            case sym.LBRACK: return "LBRACK";
+            case sym.RBRACK: return "RBRACK";
+            case sym.ERROR: return "ERROR";
+            default: return "TOK_" + tokenId;
+        }
+    }
 
     private ExpList singleton(Exp exp) {
         if (exp == null) {
@@ -113,6 +136,10 @@ parser code {:
         }
         return result;
     }
+
+    private boolean isVoidType(Exp exp) {
+        return (exp instanceof TypeSpec) && "void".equals(((TypeSpec) exp).name);
+    }
 :};
    
    
@@ -154,7 +181,7 @@ declaration_list
                 | declaration:d
                   {: RESULT = singleton(d); :}
                 | declaration_list:l error SEMI
-                  {: parser.report_error("invalid declaration", null);
+                  {: parser.report_error("Missing semicolon", null);
                      RESULT = l;
                   :}
                 ;
@@ -176,18 +203,19 @@ type_specifier
                   {: RESULT = new TypeSpec(bleft, bright, "bool"); :}
                 ;
 
-var_type
-              ::=INT:i
-                  {:RESULT = new TypeSpec(ileft, iright, "int"); :}
-                | BOOL:b
-                  {: RESULT = new TypeSpec(bleft, bright, "bool"); :}
-                ;
-
 var_declaration
-              ::= var_type:t ID:i SEMI
-                  {: RESULT = new VarDeclExp(ileft, iright, (TypeSpec)t, i, null); :}
-                | var_type:t ID:i LBRACK NUM:n RBRACK SEMI
-                  {: RESULT = new VarDeclExp(ileft, iright, (TypeSpec)t, i, new IntExp(nleft, nright, n)); :}
+              ::= type_specifier:t ID:i SEMI
+                  {: if (isVoidType(t)) {
+                         parser.report_error("void variable declaration is not allowed", null);
+                     }
+                     RESULT = new VarDeclExp(ileft, iright, (TypeSpec)t, i, null);
+                  :}
+                | type_specifier:t ID:i LBRACK NUM:n RBRACK SEMI
+                  {: if (isVoidType(t)) {
+                         parser.report_error("void array declaration is not allowed", null);
+                     }
+                     RESULT = new VarDeclExp(ileft, iright, (TypeSpec)t, i, new IntExp(nleft, nright, n));
+                  :}
                 ;
 
 fun_declaration
@@ -211,10 +239,18 @@ param_list    ::= param_list:l COMMA param:p
                   {: RESULT = singleton(p); :}
                 ;
 
-param         ::= var_type:t ID:i
-                  {: RESULT = new ParamExp(ileft, iright, (TypeSpec)t, i, false); :}
-                | var_type:t ID:i LBRACK RBRACK
-                  {: RESULT = new ParamExp(ileft, iright, (TypeSpec)t, i, true); :}
+param         ::= type_specifier:t ID:i
+                  {: if (isVoidType(t)) {
+                         parser.report_error("void parameter is not allowed", null);
+                     }
+                     RESULT = new ParamExp(ileft, iright, (TypeSpec)t, i, false);
+                  :}
+                | type_specifier:t ID:i LBRACK RBRACK
+                  {: if (isVoidType(t)) {
+                         parser.report_error("void array parameter is not allowed", null);
+                     }
+                     RESULT = new ParamExp(ileft, iright, (TypeSpec)t, i, true);
+                  :}
                 ;
 
 compound_stmt ::= LBRACE local_declarations:l statement_list:s RBRACE
@@ -224,6 +260,14 @@ compound_stmt ::= LBRACE local_declarations:l statement_list:s RBRACE
 local_declarations
               ::= local_declarations:l var_declaration:d
                   {: RESULT = append(l, d); :}
+                | local_declarations:l error SEMI
+                  {: parser.report_error("invalid local declaration, synchronized at ';'", null);
+                     RESULT = l;
+                  :}
+                | local_declarations:l error RBRACE
+                  {: parser.report_error("invalid local declaration before '}'", null);
+                     RESULT = l;
+                  :}
                 | /* empty */
                   {: RESULT = null; :}
                 ;
@@ -233,6 +277,14 @@ statement_list
                   {: RESULT = append(l, s); :}
                 | /* empty */
                   {: RESULT = null; :}
+                | statement_list:l error SEMI
+                  {: parser.report_error("invalid statement, synchronized at ';'", null);
+                     RESULT = l;
+                  :}
+                | statement_list:l error RBRACE
+                  {: parser.report_error("invalid statement before '}'", null);
+                     RESULT = l;
+                  :}
                 ;
 
 statement     ::= expression_stmt:s
@@ -259,17 +311,29 @@ selection_stmt
                   {: RESULT = new IfExp(ileft, iright, e, singleton(s), singleton(new NilExp(ileft, iright))); :}
                 | IF:i LPAREN expression:e RPAREN statement:s1 ELSE statement:s2
                   {: RESULT = new IfExp(ileft, iright, e, singleton(s1), singleton(s2)); :}
+                | IF:i LPAREN error:e RPAREN statement:s
+                  {: parser.report_error("invalid if condition", e);
+                     RESULT = new IfExp(ileft, iright, new NilExp(ileft, iright), singleton(s), singleton(new NilExp(ileft, iright)));
+                  :}
                 ;
 
 iteration_stmt
               ::= WHILE:w LPAREN expression:e RPAREN statement:s
                   {: RESULT = new WhileExp(wleft, wright, e, s); :}
+                | WHILE:w LPAREN error:e RPAREN statement:s
+                  {: parser.report_error("invalid while condition", e);
+                     RESULT = new WhileExp(wleft, wright, new NilExp(wleft, wright), s);
+                  :}
                 ;
 
 return_stmt   ::= RETURN:r SEMI
                   {: RESULT = new ReturnExp(rleft, rright, new NilExp(rleft, rright)); :}
                 | RETURN:r expression:e SEMI
                   {: RESULT = new ReturnExp(rleft, rright, e); :}
+                | RETURN:r error:e SEMI
+                  {: parser.report_error("invalid return expression", e);
+                     RESULT = new ReturnExp(rleft, rright, new NilExp(rleft, rright));
+                  :}
                 ;
 
 expression    ::= var:v ASSIGN expression:e
@@ -282,12 +346,28 @@ expression    ::= var:v ASSIGN expression:e
                   {: RESULT = new OpExp(lleft, lright, l, o.intValue(), r); :}
                 | expression:l PLUS expression:r
                   {: RESULT = new OpExp(lleft, lright, l, OpExp.PLUS, r); :}
+                | expression:l PLUS error:e
+                  {: parser.report_error("missing expression after '+'", e);
+                     RESULT = l;
+                  :}
                 | expression:l MINUS expression:r
                   {: RESULT = new OpExp(lleft, lright, l, OpExp.MINUS, r); :}
+                | expression:l MINUS error:e
+                  {: parser.report_error("missing expression after '-'", e);
+                     RESULT = l;
+                  :}
                 | expression:l TIMES expression:r
                   {: RESULT = new OpExp(lleft, lright, l, OpExp.TIMES, r); :}
+                | expression:l TIMES error:e
+                  {: parser.report_error("missing expression after '*'", e);
+                     RESULT = l;
+                  :}
                 | expression:l OVER expression:r
                   {: RESULT = new OpExp(lleft, lright, l, OpExp.OVER, r); :}
+                | expression:l OVER error:e
+                  {: parser.report_error("missing expression after '/'", e);
+                     RESULT = l;
+                  :}
                 | MINUS:m expression:e
                   {: RESULT = new OpExp(mleft, mright, new NilExp(mleft, mright), OpExp.UMINUS, e); :}
                   %prec UMINUS
@@ -314,9 +394,9 @@ relop         ::= LTEQ
 
 factor        ::= LPAREN expression:e RPAREN
                   {: RESULT = e; :}
-                | LPAREN error RPAREN
-                  {: parser.report_error("invalid expression", null);
-                     RESULT = null;
+                | LPAREN:p error:e RPAREN
+                  {: parser.report_error("invalid parenthesized expression", e);
+                     RESULT = new NilExp(pleft, pright);
                   :}
                 | var:v
                   {: RESULT = v; :}
@@ -330,6 +410,10 @@ factor        ::= LPAREN expression:e RPAREN
 
 call          ::= ID:i LPAREN args:a RPAREN
                   {: RESULT = new CallExp(ileft, iright, i, a); :}
+                | ID:i LPAREN error:e RPAREN
+                  {: parser.report_error("invalid argument list in call", e);
+                     RESULT = new CallExp(ileft, iright, i, null);
+                  :}
                 ;
 
 args          ::= arg_list:l
@@ -340,6 +424,14 @@ args          ::= arg_list:l
 
 arg_list      ::= arg_list:l COMMA expression:e
                   {: RESULT = append(l, e); :}
+                | arg_list:l COMMA error:e
+                  {: parser.report_error("missing argument expression after ','", e);
+                     RESULT = l;
+                  :}
+                | arg_list:l COMMA error:e COMMA expression:r
+                  {: parser.report_error("missing argument expression between commas", e);
+                     RESULT = append(l, r);
+                  :}
                 | expression:e
                   {: RESULT = singleton(e); :}
                 ;
@@ -348,4 +440,8 @@ var           ::= ID:i
                   {: RESULT = new VarExp(ileft, iright, i); :}
                 | ID:i LBRACK expression:e RBRACK
                   {: RESULT = new IndexVarExp(ileft, iright, i, e); :}
+                | ID:i LBRACK error:e RBRACK
+                  {: parser.report_error("invalid array index", e);
+                     RESULT = new IndexVarExp(ileft, iright, i, new NilExp(ileft, iright));
+                  :}
                 ;
