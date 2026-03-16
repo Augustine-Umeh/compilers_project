@@ -1,0 +1,50 @@
+The abstract syntax tree is:
+FunDeclExp: sum
+    ResultType:
+        TypeSpec: int
+    Params:
+        ParamExp: a
+            TypeSpec: int
+        ParamExp: b
+            TypeSpec: int
+    Body:
+        CompoundExp:
+            Statements:
+                ReturnExp:
+                    OpExp: +
+                        VarExp: a
+                        VarExp: b
+FunDeclExp: main
+    ResultType:
+        TypeSpec: void
+    Params:
+        NilExp
+    Body:
+        CompoundExp:
+            LocalDecls:
+                VarDeclExp: x
+                    TypeSpec: int
+                VarDeclExp: arr
+                    TypeSpec: int
+                    ArraySize:
+                        IntExp: 10
+            Statements:
+                OpExp: =
+                    VarExp: x
+                    CallExp: input
+                IfExp:
+                    OpExp: >
+                        VarExp: x
+                        IntExp: 0
+                    CompoundExp:
+                        Statements:
+                            CallExp: output
+                                CallExp: sum
+                                    VarExp: x
+                                    IntExp: 1
+                    CompoundExp:
+                        Statements:
+                            CallExp: output
+                                IntExp: 0
+                ReturnExp:
+                    NilExp

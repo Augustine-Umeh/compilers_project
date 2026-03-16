@@ -1,0 +1,50 @@
+/*
+ * 5.cm (stress test: many lexical/syntax errors)
+ * This file intentionally includes at least one instance of each major
+ * syntax-recovery category implemented in the grammar:
+ * - declaration-list invalid token
+ * - local declaration errors
+ * - statement-sequence errors
+ * - expression sequence errors (+, -, *, / missing RHS)
+ * - invalid parenthesized expression
+ * - invalid if / while condition
+ * - invalid return expression
+ * - invalid call arguments
+ * - missing arg after comma and between commas
+ * - invalid array index
+ * - direct ERROR token usage in expression statement
+ */
+
+int g(int a, int b) {
+  return a;
+}
+
+@;
+
+void main(void) {
+  int arr[10]
+  int ;
+  ?;
+
+  arr[@] = 1;
+  arr[1 + ] = 2;
+  arr[2] = 3 - ;
+  arr[3] = 4 * ;
+  arr[4] = 5 / ;
+
+  if (arr[0] < ) {
+    arr[0] = 1;
+  }
+
+  while (~) {
+    arr[0] = arr[0] - 1;
+  }
+
+  return @;
+
+  g(1,);
+  g(1,,2);
+  g(@);
+
+  arr[0] = ();
+}

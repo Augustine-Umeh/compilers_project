@@ -1,0 +1,21 @@
+/* 
+ * 1.cm (valid program)
+ * Expected: no lexical or syntax errors.
+ * Purpose: baseline successful parse and AST generation.
+ */
+
+int sum(int a, int b) {
+  return a + b;
+}
+
+void main(void) {
+  int x;
+  int arr[10];
+  x = input();
+  if (x > 0) {
+    output(sum(x, 1));
+  } else {
+    output(0);
+  }
+  return;
+}

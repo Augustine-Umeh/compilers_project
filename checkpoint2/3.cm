@@ -1,0 +1,18 @@
+/*
+ * 3.cm (two targeted syntax errors)
+ * Error 1: invalid while condition (empty condition).
+ * Error 2: missing argument expression between commas in function call.
+ * Purpose: control-condition recovery + argument-sequence recovery.
+ */
+
+int f(int a, int b) {
+  return a;
+}
+
+void main(void) {
+  int x;
+  while () {
+    x = 1;
+  }
+  f(1,,2);
+}

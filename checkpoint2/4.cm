@@ -1,0 +1,16 @@
+/*
+ * 4.cm (three targeted syntax errors)
+ * Error 1: invalid local declaration ("int ;").
+ * Error 2: invalid array index ("a[] = ...").
+ * Error 3: invalid if condition ("a[0] < )").
+ * Purpose: block declaration recovery + indexing recovery + if-condition recovery.
+ */
+
+void main(void) {
+  int a[10];
+  int ;
+  a[] = 3;
+  if (a[0] < ) {
+    a[0] = 1;
+  }
+}

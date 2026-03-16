@@ -1,0 +1,12 @@
+/*
+ * 2.cm (two targeted errors)
+ * Error 1 (syntax): missing semicolon after local declaration.
+ * Error 2 (lexical): illegal character '@' in expression.
+ * Purpose: declaration recovery + lexical ERROR token handling.
+ */
+
+void main(void) {
+  int x
+  x = 1 @ 2;
+  output(x);
+}
