@@ -16,7 +16,7 @@ TEST INSTRUCTIONS:
 
 To test source code like "1.cm", type 
 
-"java -cp /usr/share/java/cup.jar:. -s CM 1.cm"
+"./CM -a -s 1.cm"
 
 and the symbol table will be outputed to 1.sym
 
