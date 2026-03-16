@@ -17,30 +17,33 @@ import absyn.*;
 class Main {
   public final static boolean SHOW_TREE = true;
 
-  public static String toAbsFileName(String inputFileName) {
-      int dotIndex = inputFileName.lastIndexOf('.');
+  public static String newFileName(String inputFileName, String ext) {
+    int dotIndex = inputFileName.lastIndexOf('.');
       
-      String baseName;
-      if (dotIndex > 0) {
-          baseName = inputFileName.substring(0, dotIndex);
-      } else {
-          baseName = inputFileName;  // no extension found
-      }
+    String baseName;
+    if (dotIndex > 0) {
+        baseName = inputFileName.substring(0, dotIndex);
+    } else {
+        baseName = inputFileName;  // no extension found
+    }
 
-      return baseName + ".abs";
+    return baseName + ext;
   }
-  public static String toSymFileName(String inputFileName) {
-      int dotIndex = inputFileName.lastIndexOf('.');
 
-      String baseName;
-      if (dotIndex > 0) {
-          baseName = inputFileName.substring(0, dotIndex);
-      } else {
-          baseName = inputFileName;  // no extension found
-      }
+  public static int setNewOutputFile(String inputFileName, String ext){
+    //dynamically set output file based on inputfile
+    try {
+      PrintStream fileOut = new PrintStream(new File(newFileName(inputFileName, ext)));
+      System.setOut(fileOut); // set stdout to output file
 
-      return baseName + ".sym";
+      return 1;//return success
+    } catch (FileNotFoundException e) {
+      System.err.println("Error: Cannot create or write to file '" + inputFileName + ext + "'");
+
+      return 0;//stop parser return error
+    }
   }
+
   static public void main(String argv[]) {   
     if (argv.length < 2) {
       System.err.println("Usage: java Main [-a] [-s] [-c] <inputfile>");
@@ -78,25 +81,16 @@ class Main {
     }
 
     if (doAst && SHOW_TREE && result != null) {
-      PrintStream originalOut = System.out;
-      try (PrintStream absOut = new PrintStream(new File(toAbsFileName(inputfile)))) {
-        System.setOut(absOut);
-        System.out.println("The abstract syntax tree is:");
+      if(setNewOutputFile(inputfile, ".abs")){
         AbsynVisitor visitor = new ShowTreeVisitor();
         result.accept(visitor, 0);
-      } catch (FileNotFoundException e) {
-        System.err.println("Error: Cannot create or write to file '" + toAbsFileName(inputfile) + "'");
-      } finally {
-        System.setOut(originalOut);
       }
     }
 
     if (doSemantic && parser.valid && result != null) {
-      try (PrintStream symOut = new PrintStream(new File(toSymFileName(inputfile)))) {
+      if(setNewOutputFile(inputfile, ".sym")){
         SemanticAnalyzer analyzer = new SemanticAnalyzer(symOut);
         analyzer.analyze(result);
-      } catch (FileNotFoundException e) {
-        System.err.println("Error: Cannot create or write to file '" + toSymFileName(inputfile) + "'");
       }
     }
 
