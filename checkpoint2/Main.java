@@ -41,14 +41,14 @@ class Main {
     String flag = argv[0];  // take flag
     String inputfile = argv[1]; // store filename
 
-    //dynamically set output file based on inputfile
-    try {
-      PrintStream fileOut = new PrintStream(new File(toAbsFileName(inputfile)));
-      System.setOut(fileOut); // set stdout to output file
-  } catch (FileNotFoundException e) {
-      System.err.println("Error: Cannot create or write to file '" + inputfile + "'");
-  }
     if (flag.equals("-a")) {
+        //dynamically set output file based on inputfile
+        try {
+          PrintStream fileOut = new PrintStream(new File(toAbsFileName(inputfile)));
+          System.setOut(fileOut); // set stdout to output file
+        } catch (FileNotFoundException e) {
+          System.err.println("Error: Cannot create or write to file '" + inputfile + "'");
+        }
         /* Start the parser */
         try {
           parser p = new parser(new Lexer(new FileReader(inputfile)));
