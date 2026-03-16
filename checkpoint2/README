@@ -8,7 +8,7 @@ server and the commented settings are for my MacBook.
 BUILD INSTRUCTIONS:
 
 To build the parser, type "make" in the current directory, which will 
-generate an executable program called "Main".
+generate an executable program called "CM".
 
 To rebuild the parser, type "make clean" and type "make" again.
 
@@ -16,7 +16,7 @@ TEST INSTRUCTIONS:
 
 To test source code like "1.cm", type 
 
-"java -cp /usr/share/java/cup.jar:. -s Main 1.cm"
+"java -cp /usr/share/java/cup.jar:. -s CM 1.cm"
 
 and the symbol table will be outputed to 1.sym
 
