@@ -10,7 +10,7 @@ CLASSPATH=-cp $(CUP_JAR):.
 
 CUP=$(JAVA) $(CLASSPATH) java_cup.Main
 
-all: Main.class
+all: Main.class CM
 #all: old_scanner_for_testing.java
 # all: Token.class Lexer.class ScannerII.class
 
@@ -18,6 +18,11 @@ Main.class: absyn/*.java parser.java sym.java Lexer.java ShowTreeVisitor.java Sc
 
 %.class: %.java
 	$(JAVAC) $(CLASSPATH) $^
+
+CM: Main.class
+	echo '#!/bin/bash' > CM
+	echo 'java -cp ./java-cup-bin-11b-20160615/java-cup-11b.jar:. Main "$$@"' >> CM
+	chmod +x CM
 
 Lexer.java: cminus.flex
 	$(JFLEX) cminus.flex
@@ -27,4 +32,4 @@ parser.java: cminus.cup
 	$(CUP) -expect 3 cminus.cup
 
 clean:
-	rm -f parser.java Lexer.java sym.java *.class absyn/*.class *.sym *~
+	rm -f parser.java Lexer.java sym.java *.class absyn/*.class *.sym CM *~
