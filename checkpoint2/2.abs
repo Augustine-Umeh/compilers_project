@@ -1,0 +1,27 @@
+The abstract syntax tree is:
+FunDeclExp: main
+    ResultType:
+        TypeSpec: void
+    Params:
+        NilExp
+    Body:
+        CompoundExp:
+            LocalDecls:
+                VarDeclExp: x
+                    TypeSpec: int
+            Statements:
+                OpExp: =
+                    VarExp: x
+                    VarExp: missing
+                OpExp: =
+                    VarExp: x
+                    CallExp: output
+                        IntExp: 1
+                OpExp: =
+                    VarExp: x
+                    OpExp: +
+                        CallExp: output
+                            IntExp: 2
+                        IntExp: 3
+                ReturnExp:
+                    NilExp

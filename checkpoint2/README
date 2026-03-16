@@ -8,9 +8,9 @@ server and the commented settings are for my MacBook.
   To build the parser, type "make" in the current directory, which will 
 generate an executable program called "Main".
 
-  To test source code like "fac.tiny", type 
+  To test source code like "1.cm", type 
 
-    "java -cp /usr/share/java/cup.jar:. Main fac.tiny" 
+    "java -cp /usr/share/java/cup.jar:. Main 1.cm" 
 
 and the syntax tree will be displayed on the screen.
 

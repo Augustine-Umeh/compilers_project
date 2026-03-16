@@ -1,18 +1,21 @@
 /*
- * 3.cm (two targeted syntax errors)
- * Error 1: invalid while condition (empty condition).
- * Error 2: missing argument expression between commas in function call.
- * Purpose: control-condition recovery + argument-sequence recovery.
+ * 3.cm - Three targeted semantic errors
+ * 1) Redefinition in same scope
+ * 2) Array index expression is bool (not int)
+ * 3) Wrong argument count in function call
  */
 
-int f(int a, int b) {
-  return a;
+int sum2(int a, int b) {
+  return a + b;
 }
 
 void main(void) {
-  int x;
-  while () {
-    x = 1;
-  }
-  f(1,,2);
+  int a;
+  int a;
+  int arr[4];
+  int i;
+  i = 1;
+  arr[i < 2] = 7;
+  output(sum2(1));
+  return;
 }

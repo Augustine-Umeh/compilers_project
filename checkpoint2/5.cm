@@ -1,50 +1,42 @@
 /*
- * 5.cm (stress test: many lexical/syntax errors)
- * This file intentionally includes at least one instance of each major
- * syntax-recovery category implemented in the grammar:
- * - declaration-list invalid token
- * - local declaration errors
- * - statement-sequence errors
- * - expression sequence errors (+, -, *, / missing RHS)
- * - invalid parenthesized expression
- * - invalid if / while condition
- * - invalid return expression
- * - invalid call arguments
- * - missing arg after comma and between commas
- * - invalid array index
- * - direct ERROR token usage in expression statement
+ * 5.cm - Semantic stress test
+ * Expected: many semantic errors across scope, indexing, assignments,
+ * conditions, calls, and returns.
  */
 
-int g(int a, int b) {
-  return a;
+int good(int x, int y) {
+  return x + y;
 }
 
-@;
+void noop(void) {
+  return;
+}
+
+void takesInt(int x) {
+  return;
+}
 
 void main(void) {
-  int arr[10]
-  int ;
-  ?;
+  int a;
+  int a;
+  int arr[3];
 
-  arr[@] = 1;
-  arr[1 + ] = 2;
-  arr[2] = 3 - ;
-  arr[3] = 4 * ;
-  arr[4] = 5 / ;
+  a = unknown;
+  arr[output(1)] = 2;
+  a = noop();
+  a = noop() + 1;
 
-  if (arr[0] < ) {
-    arr[0] = 1;
+  if (noop()) {
+    a = 1;
   }
 
-  while (~) {
-    arr[0] = arr[0] - 1;
+  while (noop()) {
+    a = a + 1;
   }
 
-  return @;
-
-  g(1,);
-  g(1,,2);
-  g(@);
-
-  arr[0] = ();
+  takesInt(noop());
+  good(1);
+  output(arr);
+  arr = 4;
+  return noop();
 }

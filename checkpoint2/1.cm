@@ -1,19 +1,38 @@
-/* 
- * 1.cm (valid program)
- * Expected: no lexical or syntax errors.
- * Purpose: baseline successful parse and AST generation.
+/*
+ * 1.cm - Valid semantic baseline
+ * Expected semantic result: no errors.
+ * Coverage: globals, arrays, function calls, nested block scope.
  */
 
-int sum(int a, int b) {
-  return a + b;
+int g;
+int nums[5];
+
+int add(int a, int b) {
+  int tmp;
+  tmp = a + b;
+  return tmp;
+}
+
+void fill(int base) {
+  int i;
+  i = 0;
+  while (i < 5) {
+    nums[i] = base + i;
+    i = i + 1;
+  }
+  return;
 }
 
 void main(void) {
   int x;
-  int arr[10];
+  int y;
   x = input();
-  if (x > 0) {
-    output(sum(x, 1));
+  fill(x);
+  y = add(nums[0], true);
+  if (y > 0) {
+    int inner;
+    inner = y;
+    output(inner);
   } else {
     output(0);
   }

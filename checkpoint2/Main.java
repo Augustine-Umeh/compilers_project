@@ -27,51 +27,81 @@ class Main {
           baseName = inputFileName;  // no extension found
       }
 
-      System.out.println(baseName + ".abs");
-
       return baseName + ".abs";
   }
-  static public void main(String argv[]) {   
+  public static String toSymFileName(String inputFileName) {
+      int dotIndex = inputFileName.lastIndexOf('.');
 
+      String baseName;
+      if (dotIndex > 0) {
+          baseName = inputFileName.substring(0, dotIndex);
+      } else {
+          baseName = inputFileName;  // no extension found
+      }
+
+      return baseName + ".sym";
+  }
+  static public void main(String argv[]) {   
     if (argv.length < 2) {
-      System.err.println("Usage: java Main <-a|-s|-c> <inputfile>");
+      System.err.println("Usage: java Main [-a] [-s] [-c] <inputfile>");
       return;
     }
 
-    String flag = argv[0];  // take flag
-    String inputfile = argv[1]; // store filename
+    boolean doAst = false;
+    boolean doSemantic = false;
+    boolean doCodegen = false;
 
-    if (flag.equals("-a")) {
-        //dynamically set output file based on inputfile
-        try {
-          PrintStream fileOut = new PrintStream(new File(toAbsFileName(inputfile)));
-          System.setOut(fileOut); // set stdout to output file
-        } catch (FileNotFoundException e) {
-          System.err.println("Error: Cannot create or write to file '" + inputfile + "'");
-        }
-        /* Start the parser */
-        try {
-          parser p = new parser(new Lexer(new FileReader(inputfile)));
-          Absyn result = (Absyn)(p.parse().value);      
-          if (SHOW_TREE && result != null) {
-            System.out.println("The abstract syntax tree is:");
-            AbsynVisitor visitor = new ShowTreeVisitor();
-            result.accept(visitor, 0); 
-          }
-        } catch (Exception e) {
-          /* do cleanup here -- possibly rethrow e */
-          e.printStackTrace();
-        }
-    }
-    else if (flag.equals("-s")) {
-        //checkpoint 2
-    }
-    else if (flag.equals("-c")) {
-        //checkpoint 3
-    }
-    else {
-        System.err.println("Unknown flag: " + flag);
+    for (int i = 0; i < argv.length - 1; i++) {
+      if ("-a".equals(argv[i])) {
+        doAst = true;
+      } else if ("-s".equals(argv[i])) {
+        doSemantic = true;
+      } else if ("-c".equals(argv[i])) {
+        doCodegen = true;
+      } else {
+        System.err.println("Unknown flag: " + argv[i]);
         System.err.println("Use -a, -s, or -c");
+        return;
+      }
+    }
+
+    String inputfile = argv[argv.length - 1];
+
+    parser.valid = true;
+    Absyn result = null;
+    try {
+      parser p = new parser(new Lexer(new FileReader(inputfile)));
+      result = (Absyn) (p.parse().value);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return;
+    }
+
+    if (doAst && SHOW_TREE && result != null) {
+      PrintStream originalOut = System.out;
+      try (PrintStream absOut = new PrintStream(new File(toAbsFileName(inputfile)))) {
+        System.setOut(absOut);
+        System.out.println("The abstract syntax tree is:");
+        AbsynVisitor visitor = new ShowTreeVisitor();
+        result.accept(visitor, 0);
+      } catch (FileNotFoundException e) {
+        System.err.println("Error: Cannot create or write to file '" + toAbsFileName(inputfile) + "'");
+      } finally {
+        System.setOut(originalOut);
+      }
+    }
+
+    if (doSemantic && parser.valid && result != null) {
+      try (PrintStream symOut = new PrintStream(new File(toSymFileName(inputfile)))) {
+        SemanticAnalyzer analyzer = new SemanticAnalyzer(symOut);
+        analyzer.analyze(result);
+      } catch (FileNotFoundException e) {
+        System.err.println("Error: Cannot create or write to file '" + toSymFileName(inputfile) + "'");
+      }
+    }
+
+    if (doCodegen) {
+      // checkpoint 3
     }
   }
 }

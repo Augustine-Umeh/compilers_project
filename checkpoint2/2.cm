@@ -1,12 +1,14 @@
 /*
- * 2.cm (two targeted errors)
- * Error 1 (syntax): missing semicolon after local declaration.
- * Error 2 (lexical): illegal character '@' in expression.
- * Purpose: declaration recovery + lexical ERROR token handling.
+ * 2.cm - Three targeted semantic errors
+ * 1) Undefined variable use
+ * 2) Type mismatch in assignment (void -> int)
+ * 3) Void value used in arithmetic
  */
 
 void main(void) {
-  int x
-  x = 1 @ 2;
-  output(x);
+  int x;
+  x = missing;
+  x = output(1);
+  x = output(2) + 3;
+  return;
 }

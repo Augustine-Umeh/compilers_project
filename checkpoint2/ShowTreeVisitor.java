@@ -158,35 +158,26 @@ public class ShowTreeVisitor implements AbsynVisitor {
 
   public void visit(VarDeclExp exp, int level) {
     indent(level);
-    System.out.println("VarDeclExp: " + exp.name);
-    level++;
-    if (exp.type != null) {
-      exp.type.accept(this, level);
-    }
+    String typeName = (exp.type != null) ? exp.type.name + " " : "";
+    System.out.println("VarDeclExp: " + typeName + exp.name);
     if (exp.size != null) {
-      indent(level);
+      indent(level + 1);
       System.out.println("ArraySize:");
-      exp.size.accept(this, level + 1);
+      exp.size.accept(this, level + 2);
     }
   }
 
   public void visit(ParamExp exp, int level) {
     indent(level);
-    System.out.println("ParamExp: " + exp.name + (exp.isArray ? "[]" : ""));
-    if (exp.type != null) {
-      exp.type.accept(this, level + 1);
-    }
+    String typeName = (exp.type != null) ? exp.type.name + " " : "";
+    System.out.println("ParamExp: " + typeName + exp.name + (exp.isArray ? "[]" : ""));
   }
 
   public void visit(FunDeclExp exp, int level) {
     indent(level);
-    System.out.println("FunDeclExp: " + exp.name);
+    String retType = (exp.resultType != null) ? exp.resultType.name + " " : "";
+    System.out.println("FunDeclExp: " + retType + exp.name);
     level++;
-    if (exp.resultType != null) {
-      indent(level);
-      System.out.println("ResultType:");
-      exp.resultType.accept(this, level + 1);
-    }
     if (exp.params != null) {
       indent(level);
       System.out.println("Params:");

@@ -37,6 +37,8 @@ import java_cup.runtime.*;
    generated parser.
 */
 %cup
+
+%xstate COMMENT
    
 /*
   Declarations
@@ -126,5 +128,10 @@ TRUTH = true|false
 {TRUTH}                          {return symbol(sym.TRUTH, yytext());}
 {ID}                             {return symbol(sym.ID, yytext());}
 {WhiteSpace}+                    { /* skip whitespace */ }
-"/*"([^*]|\*+[^*/])*\*+"/"       { /* skip comments */ }
+"/*"                             { yybegin(COMMENT); }
 .                                { return symbol(sym.ERROR);}
+
+<COMMENT> {
+  "*/"                           { yybegin(YYINITIAL); }
+  [^]                            { /* consume comment body */ }
+}

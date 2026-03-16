@@ -1,16 +1,22 @@
 /*
- * 4.cm (three targeted syntax errors)
- * Error 1: invalid local declaration ("int ;").
- * Error 2: invalid array index ("a[] = ...").
- * Error 3: invalid if condition ("a[0] < )").
- * Purpose: block declaration recovery + indexing recovery + if-condition recovery.
+ * 4.cm - Three targeted semantic errors
+ * 1) Returning a value from a void function
+ * 2) Void expression used as if-condition
+ * 3) Wrong argument type in function call
  */
 
+int takesInt(int x) {
+  return x;
+}
+
+void bad(void) {
+  return 1;
+}
+
 void main(void) {
-  int a[10];
-  int ;
-  a[] = 3;
-  if (a[0] < ) {
-    a[0] = 1;
+  if (output(1)) {
+    output(0);
   }
+  output(bad());
+  return;
 }

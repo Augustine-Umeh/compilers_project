@@ -1,47 +1,90 @@
 The abstract syntax tree is:
-FunDeclExp: sum
-    ResultType:
-        TypeSpec: int
+VarDeclExp: int g
+VarDeclExp: int nums
+    ArraySize:
+        IntExp: 5
+FunDeclExp: int add
     Params:
-        ParamExp: a
-            TypeSpec: int
-        ParamExp: b
-            TypeSpec: int
+        ParamExp: int a
+        ParamExp: int b
     Body:
         CompoundExp:
+            LocalDecls:
+                VarDeclExp: int tmp
             Statements:
-                ReturnExp:
+                OpExp: =
+                    VarExp: tmp
                     OpExp: +
                         VarExp: a
                         VarExp: b
-FunDeclExp: main
-    ResultType:
-        TypeSpec: void
+                ReturnExp:
+                    VarExp: tmp
+FunDeclExp: void fill
+    Params:
+        ParamExp: int base
+    Body:
+        CompoundExp:
+            LocalDecls:
+                VarDeclExp: int i
+            Statements:
+                OpExp: =
+                    VarExp: i
+                    IntExp: 0
+                WhileExp:
+                    Condition:
+                        OpExp: <
+                            VarExp: i
+                            IntExp: 5
+                    Body:
+                        CompoundExp:
+                            Statements:
+                                OpExp: =
+                                    IndexVarExp: nums
+                                        VarExp: i
+                                    OpExp: +
+                                        VarExp: base
+                                        VarExp: i
+                                OpExp: =
+                                    VarExp: i
+                                    OpExp: +
+                                        VarExp: i
+                                        IntExp: 1
+                ReturnExp:
+                    NilExp
+FunDeclExp: void main
     Params:
         NilExp
     Body:
         CompoundExp:
             LocalDecls:
-                VarDeclExp: x
-                    TypeSpec: int
-                VarDeclExp: arr
-                    TypeSpec: int
-                    ArraySize:
-                        IntExp: 10
+                VarDeclExp: int x
+                VarDeclExp: int y
             Statements:
                 OpExp: =
                     VarExp: x
                     CallExp: input
+                CallExp: fill
+                    VarExp: x
+                OpExp: =
+                    VarExp: y
+                    CallExp: add
+                        IndexVarExp: nums
+                            IntExp: 0
+                        IndexVarExp: nums
+                            IntExp: 1
                 IfExp:
                     OpExp: >
-                        VarExp: x
+                        VarExp: y
                         IntExp: 0
                     CompoundExp:
+                        LocalDecls:
+                            VarDeclExp: int inner
                         Statements:
+                            OpExp: =
+                                VarExp: inner
+                                VarExp: y
                             CallExp: output
-                                CallExp: sum
-                                    VarExp: x
-                                    IntExp: 1
+                                VarExp: inner
                     CompoundExp:
                         Statements:
                             CallExp: output

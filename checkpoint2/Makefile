@@ -14,7 +14,7 @@ all: Main.class
 #all: old_scanner_for_testing.java
 # all: Token.class Lexer.class ScannerII.class
 
-Main.class: absyn/*.java parser.java sym.java Lexer.java ShowTreeVisitor.java Scanner.java Main.java
+Main.class: absyn/*.java parser.java sym.java Lexer.java ShowTreeVisitor.java Scanner.java Main.java SymbolTable.java SemanticAnalyzer.java
 
 %.class: %.java
 	$(JAVAC) $(CLASSPATH) $^
@@ -27,4 +27,4 @@ parser.java: cminus.cup
 	$(CUP) -expect 3 cminus.cup
 
 clean:
-	rm -f parser.java Lexer.java sym.java *.class absyn/*.class *~
+	rm -f parser.java Lexer.java sym.java *.class absyn/*.class *.sym *~
