@@ -81,15 +81,15 @@ class Main {
     }
 
     if (doAst && SHOW_TREE && result != null) {
-      if(setNewOutputFile(inputfile, ".abs")){
+      if(setNewOutputFile(inputfile, ".abs") == 1){
         AbsynVisitor visitor = new ShowTreeVisitor();
         result.accept(visitor, 0);
       }
     }
 
     if (doSemantic && parser.valid && result != null) {
-      if(setNewOutputFile(inputfile, ".sym")){
-        SemanticAnalyzer analyzer = new SemanticAnalyzer(symOut);
+      if(setNewOutputFile(inputfile, ".sym") == 1){
+        SemanticAnalyzer analyzer = new SemanticAnalyzer(System.out);
         analyzer.analyze(result);
       }
     }
