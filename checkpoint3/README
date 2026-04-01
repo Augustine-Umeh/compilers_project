@@ -59,6 +59,104 @@ Once inside the simulator:
 - type `c` to clear the simulator state before another run
 - type `q` to quit
 
+RUNNING THE TEST FILES YOURSELF
+
+The usual workflow is:
+
+1. Build the compiler:
+
+   `make`
+
+2. Build the TM simulator:
+
+   `make -C providedFiles`
+
+3. Compile one C- test file to TM assembly:
+
+   `./CM -c 1.cm`
+
+4. Run the generated TM program:
+
+   `./providedFiles/tm 1.tm`
+
+5. At the `Enter command:` prompt inside the simulator:
+
+   - type `g` to start execution
+   - if the program uses `input()`, enter the requested integers
+   - type `q` after the run finishes
+
+Example valid runs:
+
+- Factorial benchmark:
+  - compile: `./CM -c 1.cm`
+  - run: `./providedFiles/tm 1.tm`
+  - then type: `g`, then `5`, then `q`
+  - expected output: `OUT instruction prints: 120`
+
+- Boolean/control-flow benchmark:
+  - compile: `./CM -c 2.cm`
+  - run: `./providedFiles/tm 2.tm`
+  - then type: `g`, then `q`
+  - expected output:
+    - `OUT instruction prints: 0`
+    - `OUT instruction prints: 1`
+    - `OUT instruction prints: 2`
+    - `OUT instruction prints: 3`
+    - `OUT instruction prints: 4`
+
+- Arrays/functions benchmark:
+  - compile: `./CM -c 3.cm`
+  - run: `./providedFiles/tm 3.tm`
+  - then type: `g`, then enter ten integers such as `9 8 7 6 5 4 3 2 1 0`, then `q`
+  - expected output for that input:
+    - `OUT instruction prints: 0`
+    - `OUT instruction prints: 1`
+    - `OUT instruction prints: 2`
+    - `OUT instruction prints: 3`
+    - `OUT instruction prints: 4`
+    - `OUT instruction prints: 5`
+    - `OUT instruction prints: 6`
+    - `OUT instruction prints: 7`
+    - `OUT instruction prints: 8`
+    - `OUT instruction prints: 9`
+
+- Mutual recursion benchmark:
+  - compile: `./CM -c 9.cm`
+  - run: `./providedFiles/tm 9.tm`
+  - then type: `g`, then `q`
+  - expected output:
+    - `OUT instruction prints: 1`
+    - `OUT instruction prints: 0`
+
+Semantic-error tests:
+
+- Use `-s` instead of `-c`:
+  - `./CM -s 5.cm`
+- This writes `5.sym` only if semantic analysis succeeds.
+- If semantic errors are present, they are printed to the terminal and no `.tm` file is generated.
+
+Runtime-error tests:
+
+- Compile the runtime bounds tests:
+  - `./CM -c 7.cm`
+  - `./CM -c 8.cm`
+- Run them in the simulator:
+  - `./providedFiles/tm 7.tm`
+  - `./providedFiles/tm 8.tm`
+- Type `g` to execute.
+- These programs are expected to halt when an array index is out of range.
+
+Using the provided course examples:
+
+- `./CM -c providedFiles/fac.cm`
+- `./providedFiles/tm providedFiles/fac.tm`
+
+- `./CM -c providedFiles/gcd.cm`
+- `./providedFiles/tm providedFiles/gcd.tm`
+
+- `./CM -c providedFiles/sort.cm`
+- `./providedFiles/tm providedFiles/sort.tm`
+
 TEST FILES
 
 The root test suite follows the checkpoint submission format:
