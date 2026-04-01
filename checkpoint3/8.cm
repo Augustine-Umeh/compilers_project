@@ -1,0 +1,14 @@
+/*
+ * 8.cm - Runtime error test
+ * Expected runtime issue:
+ * 1) Upper-bound array index violation at execution time
+ */
+
+void main(void) {
+  int a[3];
+  int i;
+
+  a[0] = 7;
+  i = 3;
+  output(a[i]);
+}

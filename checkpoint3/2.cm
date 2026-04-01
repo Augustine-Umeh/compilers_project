@@ -1,0 +1,26 @@
+/*
+ * 2.cm - Valid bool/control-flow benchmark
+ * Exercises bool values, ~, &&, ||, comparisons, and if/while control flow.
+ * Expected runtime output: 0 1 2 3 4
+ */
+
+void main(void) {
+  int i;
+  bool keepGoing;
+
+  i = 0;
+  keepGoing = true;
+
+  while ((i < 5) && keepGoing) {
+    if ((~false) || (i == 99)) {
+      output(i);
+    } else {
+      output(100);
+    }
+
+    i = i + 1;
+    if (i == 5) {
+      keepGoing = false;
+    }
+  }
+}

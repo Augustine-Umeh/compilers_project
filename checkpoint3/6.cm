@@ -1,0 +1,21 @@
+/*
+ * 6.cm - Three semantic errors
+ * 1) Returning a value from a void function
+ * 2) Wrong argument type in a function call
+ * 3) Passing an array where output expects a scalar int
+ */
+
+int takesInt(int x) {
+  return x;
+}
+
+void bad(void) {
+  return 1;
+}
+
+void main(void) {
+  int arr[3];
+
+  output(takesInt(true));
+  output(arr);
+}

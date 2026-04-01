@@ -1,0 +1,14 @@
+/*
+ * 4.cm - Syntax error recovery test
+ * Expected syntax issues:
+ * 1) Missing semicolon after local declaration
+ * 2) Invalid if condition
+ */
+
+void main(void) {
+  int x
+  x = 1 + ;
+  if (x < ) {
+    output(x);
+  }
+}

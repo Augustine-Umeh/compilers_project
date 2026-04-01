@@ -1,0 +1,87 @@
+Checkpoint 3 compiler for the C- language using JFlex, CUP, and Java.
+
+This project now supports all three checkpoint options:
+
+- `-a` : parse and write an abstract syntax tree to `*.abs`
+- `-s` : run semantic analysis and write scope/symbol output to `*.sym`
+- `-c` : generate TM assembly and write it to `*.tm`
+
+Exactly one option must be supplied for each invocation.
+
+BUILD
+
+1. Ensure `java`, `javac`, and `jflex` are available on your Linux system.
+2. In the project directory, run:
+
+   `make`
+
+3. This builds the compiler launcher `CM`.
+
+4. To rebuild from scratch, run:
+
+   `make clean`
+   `make`
+
+USAGE
+
+Run one stage at a time:
+
+- `./CM -a 1.cm`
+- `./CM -s 1.cm`
+- `./CM -c 1.cm`
+
+If the program is valid for the requested stage, the compiler writes:
+
+- `1.abs` for `-a`
+- `1.sym` for `-s`
+- `1.tm` for `-c`
+
+If no option or multiple options are supplied, the compiler prints:
+
+`Usage: java Main [-a] [-s] [-c] <inputfile>`
+
+TM SIMULATOR
+
+The provided TM simulator sources are in `providedFiles/`.
+
+Build the simulator with:
+
+`make -C providedFiles`
+
+Run a generated TM file with:
+
+`./providedFiles/tm 1.tm`
+
+Once inside the simulator:
+
+- type `g` to run the program
+- type `h` for help
+- type `c` to clear the simulator state before another run
+- type `q` to quit
+
+TEST FILES
+
+The root test suite follows the checkpoint submission format:
+
+- `1.cm`, `2.cm`, `3.cm` are valid runnable programs
+- `4.cm` through `8.cm` contain targeted syntax/semantic/runtime issues
+- `9.cm` and `0.cm` are stress tests
+
+Reference programs from the course package remain in `providedFiles/`:
+
+- `fac.cm`
+- `gcd.cm`
+- `sort.cm`
+
+Their generated TM outputs were used as implementation references for:
+
+- prelude/finale structure
+- frame layout
+- function calling convention
+- array indexing layout
+
+NOTES
+
+- The compiler uses a scanner generated from `cminus.flex` and a parser generated from `cminus.cup`.
+- Semantic analysis installs built-in `input(void) -> int` and `output(int) -> void`.
+- Code generation emits heavily commented TM assembly to make demos and debugging easier.

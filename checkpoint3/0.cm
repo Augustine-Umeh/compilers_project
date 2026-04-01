@@ -1,0 +1,25 @@
+/*
+ * 0.cm - Mixed stress test
+ * Expected many issues across redefinitions, undefined names, array indexing,
+ * bad calls, invalid conditions, and invalid returns.
+ */
+
+int foo(int x) {
+  return x;
+}
+
+void main(void) {
+  int a;
+  int a;
+  int arr[2];
+
+  a = missing;
+  arr[true] = foo();
+
+  if (output(1)) {
+    arr[3] = 0;
+  }
+
+  nope(1, 2);
+  return 1;
+}

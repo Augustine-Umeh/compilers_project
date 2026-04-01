@@ -1,0 +1,21 @@
+/*
+ * 5.cm - Three semantic errors
+ * 1) Redefinition in the same scope
+ * 2) Returning a value from a void function
+ * 3) Wrong argument count in function call
+ */
+
+int sum2(int a, int b) {
+  return a + b;
+}
+
+void bad(void) {
+  return 1;
+}
+
+void main(void) {
+  int x;
+  int x;
+
+  output(sum2(1));
+}
